@@ -5,7 +5,7 @@ use League\Flysystem\Adapter\Local as Adapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 
-class FileFinder implements LocatorInterface
+class Locator implements LocatorInterface
 {
     /**
      * @var \SplStack|string[]
