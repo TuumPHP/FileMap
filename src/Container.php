@@ -71,4 +71,13 @@ class Container
         $this->container[$file] = $this->evaluate( $file, $data );
         return $this->container[$file];
     }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function set( $name, $value )
+    {
+        $this->container[$name] = $value;
+    }
 }
