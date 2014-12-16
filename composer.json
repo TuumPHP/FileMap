@@ -1,3 +1,22 @@
 {
-  "name":"tuum/locator"
+    "name": "tuum/locator",
+    "description": "a file locator and a simple container.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Asao",
+            "email": "kamei@workspot.jp"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "league/flysystem": "0.5.*"
+    },
+    "repositories": [
+    ],
+    "autoload": {
+        "psr-4": {
+            "Tuum\\Locator\\": "src/"
+        }
+    }
 }
