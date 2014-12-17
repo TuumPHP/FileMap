@@ -16,7 +16,7 @@ class Container
     /**
      * @param LocatorInterface $union
      */
-    public function __construct( $union )
+    public function __construct($union)
     {
         $this->union = $union;
     }
@@ -25,7 +25,7 @@ class Container
      * @param string $dir
      * @return $this
      */
-    public function config( $dir )
+    public function config($dir)
     {
         $this->union->addRoot($dir);
         return $this;
@@ -39,14 +39,14 @@ class Container
      * @param array  $data
      * @return mixed|null
      */
-    public function evaluate( $file, $data=[] )
+    public function evaluate($file, $data = [])
     {
-        $file .= substr($file,-4)==='.php' ? '' : '.php';
-        if( $location = $this->union->locate($file) ) {
+        $file .= substr($file, -4) === '.php' ? '' : '.php';
+        if ($location = $this->union->locate($file)) {
             $data['app'] = $this;
             extract($data);
             /** @noinspection PhpIncludeInspection */
-            return include( $location );
+            return include($location);
         }
         return null;
     }
@@ -59,16 +59,16 @@ class Container
      * @param array  $data
      * @return mixed
      */
-    public function get( $file, $data=[] )
+    public function get($file, $data = [])
     {
-        if( array_key_exists( $file, $this->container ) ) {
+        if (array_key_exists($file, $this->container)) {
             $found = $this->container[$file];
-            if( $found instanceof \Closure ) {
+            if ($found instanceof \Closure) {
                 return $found($this);
             }
             return $found;
         }
-        $this->container[$file] = $this->evaluate( $file, $data );
+        $this->container[$file] = $this->evaluate($file, $data);
         return $this->container[$file];
     }
 
@@ -76,7 +76,7 @@ class Container
      * @param string $name
      * @param mixed  $value
      */
-    public function set( $name, $value )
+    public function set($name, $value)
     {
         $this->container[$name] = $value;
     }

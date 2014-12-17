@@ -10,37 +10,39 @@ class Locator implements LocatorInterface
     /**
      * @var \SplStack|string[]
      */
-    protected $dirs = [ ];
+    protected $dirs = [];
 
     /**
      * @param string $root
      */
-    public function __construct( $root = null )
+    public function __construct($root = null)
     {
         $this->dirs = new \SplStack();
-        $roots             = func_get_args();
-        foreach ( $roots as $root ) {
-            $this->addRoot( $root );
+        $roots      = func_get_args();
+        foreach ($roots as $root) {
+            $this->addRoot($root);
         }
     }
 
     /**
      * @param string $root
      */
-    public function addRoot( $root )
+    public function addRoot($root)
     {
-        if ( substr( $root, -1 ) !== '/' ) $root .= '/';
-        $this->dirs->push( $root );
+        if (substr($root, -1) !== '/') {
+            $root .= '/';
+        }
+        $this->dirs->push($root);
     }
 
     /**
      * @param string $file
      * @return bool|string
      */
-    public function locate( $file )
+    public function locate($file)
     {
-        foreach ( $this->dirs as $system ) {
-            if ( file_exists( $system . $file ) ) {
+        foreach ($this->dirs as $system) {
+            if (file_exists($system . $file)) {
                 return $system . $file;
             }
         }

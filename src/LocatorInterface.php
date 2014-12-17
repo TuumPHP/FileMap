@@ -12,11 +12,11 @@ interface LocatorInterface
     /**
      * @param string $root
      */
-    public function addRoot( $root );
+    public function addRoot($root);
 
     /**
      * @param string $file
      * @return bool|string
      */
-    public function locate( $file );
+    public function locate($file);
 }
