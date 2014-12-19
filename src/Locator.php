@@ -1,10 +1,6 @@
 <?php
 namespace Tuum\Locator;
 
-use League\Flysystem\Adapter\Local as Adapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
-
 class Locator implements LocatorInterface
 {
     /**
