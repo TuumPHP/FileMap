@@ -32,6 +32,15 @@ class Container
     }
 
     /**
+     * @param string $file
+     * @return bool
+     */
+    public function exists($file)
+    {
+        return (bool) $this->union->locate($file);
+    }
+
+    /**
      * evaluates an php file and returns the evaluated value
      * which are returned from the included file.
      *
