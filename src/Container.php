@@ -22,6 +22,14 @@ class Container
     }
 
     /**
+     * @return static
+     */
+    public static function forge()
+    {
+        return new static(new Locator());
+    }
+
+    /**
      * @param string $dir
      * @return $this
      */
@@ -33,11 +41,21 @@ class Container
 
     /**
      * @param string $file
+     * @return bool|string
+     */
+    public function locate($file)
+    {
+        $file .= substr($file, -4) === '.php' ? '' : '.php';
+        return $this->union->locate($file);
+    }
+
+    /**
+     * @param string $file
      * @return bool
      */
     public function exists($file)
     {
-        return (bool) $this->union->locate($file);
+        return (bool) $this->locate($file);
     }
 
     /**
@@ -50,8 +68,7 @@ class Container
      */
     public function evaluate($file, $data = [])
     {
-        $file .= substr($file, -4) === '.php' ? '' : '.php';
-        if ($location = $this->union->locate($file)) {
+        if ($location = $this->locate($file)) {
             $data['app'] = $this;
             extract($data);
             /** @noinspection PhpIncludeInspection */

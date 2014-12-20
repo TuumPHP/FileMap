@@ -24,6 +24,17 @@ class Renderer implements RendererInterface
     }
 
     /**
+     * @param string $view
+     * @return static
+     */
+    public static function forge($view)
+    {
+        $container = Container::forge();
+        $container->config($view);
+        return new static($container);
+    }
+
+    /**
      * @param string $name
      * @param mixed  $service
      */
@@ -36,7 +47,7 @@ class Renderer implements RendererInterface
      * @param string $name
      * @return null|mixed
      */
-    public function __call($name)
+    public function __call($name, $args=[])
     {
         return array_key_exists($name, $this->services) ? $this->services[$name] : null;
     }
@@ -46,6 +57,7 @@ class Renderer implements RendererInterface
      *
      * @param string $file
      * @param array  $data
+     * @return string
      * @throws \Exception
      */
     public function render($file, $data = [])
