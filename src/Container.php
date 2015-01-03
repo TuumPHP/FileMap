@@ -1,7 +1,9 @@
 <?php
 namespace Tuum\Locator;
 
-class Container
+use Tuum\Web\ServiceInterface\ContainerInterface;
+
+class Container implements ContainerInterface
 {
     /**
      * @var LocatorInterface
@@ -87,8 +89,8 @@ class Container
      */
     public function get($file, $data = [])
     {
-        if (array_key_exists($file, $this->container)) {
-            $found = $this->container[$file];
+        $found = $this->fetchFromContainer($file);
+        if( $found !== false ) {
             if ($found instanceof \Closure) {
                 return $found($this);
             }
@@ -96,6 +98,18 @@ class Container
         }
         $this->container[$file] = $this->evaluate($file, $data);
         return $this->container[$file];
+    }
+
+    /**
+     * @param string $file
+     * @return bool|mixed
+     */    
+    public function fetchFromContainer($file)
+    {
+        if (array_key_exists($file, $this->container)) {
+            return $this->container[$file];
+        }
+        return false;
     }
 
     /**
