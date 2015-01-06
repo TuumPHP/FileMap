@@ -71,7 +71,6 @@ class Container implements ContainerInterface
     public function evaluate($file, $data = [])
     {
         if ($location = $this->locate($file)) {
-            $data['app'] = $this;
             extract($data);
             /** @noinspection PhpIncludeInspection */
             return include($location);
@@ -92,7 +91,7 @@ class Container implements ContainerInterface
         $found = $this->fetchFromContainer($file);
         if( $found !== false ) {
             if ($found instanceof \Closure) {
-                return $found($this);
+                return $found();
             }
             return $found;
         }
