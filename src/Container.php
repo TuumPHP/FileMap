@@ -81,6 +81,7 @@ class Container implements ContainerInterface
     /**
      * a simple container based on evaluating a file.
      * closures will be evaluated each time.
+     * this method will not share the found object.
      *
      * @param string $file
      * @param array  $data
@@ -89,14 +90,26 @@ class Container implements ContainerInterface
     public function get($file, $data = [])
     {
         $found = $this->fetchFromContainer($file);
-        if( $found !== false ) {
+        if( $found !== null ) {
             if ($found instanceof \Closure) {
                 return $found();
             }
             return $found;
         }
+        return $this->evaluate($file, $data);
+    }
+
+    /**
+     * keep the found object for sharing.
+     *
+     * @param string $file
+     * @param array  $data
+     * @return $this
+     */
+    public function share($file, $data=[])
+    {
         $this->container[$file] = $this->evaluate($file, $data);
-        return $this->container[$file];
+        return $this;
     }
 
     /**
@@ -108,7 +121,7 @@ class Container implements ContainerInterface
         if (array_key_exists($file, $this->container)) {
             return $this->container[$file];
         }
-        return false;
+        return null;
     }
 
     /**
