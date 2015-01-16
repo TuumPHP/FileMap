@@ -36,7 +36,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase
     function locator_reads_files_under_config_and_tested()
     {
         $container = $this->container;
-        $container->container->config(__DIR__.'/config-view/tested');
+        $container->locator->config(__DIR__.'/config-view/tested');
         $this->assertEquals('tested test', $container->render('test'));
         $this->assertEquals('more', $container->render('more'));
         $this->assertEquals('tested tested', $container->render('tested'));

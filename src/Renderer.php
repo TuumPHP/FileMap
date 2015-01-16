@@ -6,9 +6,9 @@ use Tuum\Web\ServiceInterface\RendererInterface;
 class Renderer implements RendererInterface
 {
     /**
-     * @var Container
+     * @var LocatorInterface
      */
-    public $container;
+    public $locator;
 
     /**
      * @var array
@@ -16,11 +16,11 @@ class Renderer implements RendererInterface
     public $services = [];
 
     /**
-     * @param Container $container
+     * @param LocatorInterface $locator
      */
-    public function __construct($container)
+    public function __construct($locator)
     {
-        $this->container = $container;
+        $this->locator = $locator;
     }
 
     /**
@@ -29,9 +29,8 @@ class Renderer implements RendererInterface
      */
     public static function forge($view)
     {
-        $container = Container::forge();
-        $container->config($view);
-        return new static($container);
+        $locator = new Locator($view);
+        return new static($locator);
     }
 
     /**
@@ -56,16 +55,20 @@ class Renderer implements RendererInterface
      * a simple renderer for a raw PHP file.
      *
      * @param string $file
-     * @param array  $data
+     * @param array  $__data
      * @return string
      * @throws \Exception
      */
-    public function render($file, $data = [])
+    public function render($file, $__data = [])
     {
         try {
 
             ob_start();
-            $this->container->evaluate($file, $data);
+            extract($__data);
+
+            /** @noinspection PhpIncludeInspection */
+            include($this->locator->locate($file.'.php'));
+
             return ob_get_clean();
 
         } catch (\Exception $e) {
