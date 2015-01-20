@@ -61,13 +61,15 @@ class Renderer implements RendererInterface
      */
     public function render($file, $__data = [])
     {
+        $__file = $this->locator->locate($file.'.php');
+        if( !$__file ) return '';
         try {
 
             ob_start();
             extract($__data);
 
             /** @noinspection PhpIncludeInspection */
-            include($this->locator->locate($file.'.php'));
+            include($__file);
 
             return ob_get_clean();
 
