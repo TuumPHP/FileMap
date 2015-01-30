@@ -1,7 +1,7 @@
 <?php
 namespace Tuum\Locator;
 
-use Tuum\Web\ServiceInterface\ContainerInterface;
+use Tuum\Locator\ContainerInterface;
 
 class Container implements ContainerInterface
 {
