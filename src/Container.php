@@ -91,9 +91,6 @@ class Container implements ContainerInterface
     {
         $found = $this->fetchFromContainer($file);
         if( $found !== null ) {
-            if ($found instanceof \Closure) {
-                return $found();
-            }
             return $found;
         }
         return $this->evaluate($file, $data);
