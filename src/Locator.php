@@ -37,9 +37,11 @@ class Locator implements LocatorInterface
      */
     public function locate($file)
     {
+        $file = substr($file,0,1) ==='/' ? substr($file,1) : $file;
         foreach ($this->dirs as $system) {
-            if (file_exists($system . $file)) {
-                return $system . $file;
+            $location = $system . $file;
+            if (file_exists($location)) {
+                return $location;
             }
         }
         return false;
