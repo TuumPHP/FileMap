@@ -64,4 +64,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('more', $container->evaluate('more'));
         $this->assertEquals('tested tested', $container->evaluate('tested'));
     }
+
+    /**
+     * @test
+     */
+    function shared_object_returns_identical_object()
+    {
+        $container = $this->container;
+        $container->share('shared');
+        $this->assertTrue(is_object($container->get('shared')));
+        $this->assertEquals('shared', $container->get('shared')->name);
+        $this->assertSame($container->get('shared'), $container->get('shared'));
+    }
 }
