@@ -13,6 +13,7 @@ class Locator implements LocatorInterface
      */
     public function __construct($root = null)
     {
+        $this->dirs = new \SplStack();
         $roots      = func_get_args();
         foreach ($roots as $root) {
             $this->addRoot($root);
@@ -27,7 +28,7 @@ class Locator implements LocatorInterface
         if (substr($root, -1) !== '/') {
             $root .= '/';
         }
-        $this->dirs[] = $root;
+        $this->dirs->push($root);
     }
 
     /**
