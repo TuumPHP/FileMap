@@ -125,7 +125,7 @@ class Container implements ContainerInterface
      * @param string $name
      * @param mixed  $value
      */
-    public function set($name, $value)
+    public function add($name, $value)
     {
         $this->container[$name] = $value;
     }
