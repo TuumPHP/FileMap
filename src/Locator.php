@@ -1,10 +1,12 @@
 <?php
 namespace Tuum\Locator;
 
+use SplStack;
+
 class Locator implements LocatorInterface
 {
     /**
-     * @var \SplStack|string[]
+     * @var SplStack|string[]
      */
     protected $dirs = [];
 
@@ -13,7 +15,7 @@ class Locator implements LocatorInterface
      */
     public function __construct($root = null)
     {
-        $this->dirs = new \SplStack();
+        $this->dirs = new SplStack();
         $roots      = func_get_args();
         foreach ($roots as $root) {
             $this->addRoot($root);
