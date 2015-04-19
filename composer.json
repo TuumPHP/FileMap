@@ -10,7 +10,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "league/flysystem": "0.5.*"
+        "league/flysystem": "~1.0",
+        "league/commonmark": "0.7.2"
     },
     "repositories": [
     ],
