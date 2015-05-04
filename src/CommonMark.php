@@ -23,13 +23,11 @@ class CommonMark
     private $cache;
 
     /**
-     * @param CommonMarkConverter $mark
      * @param string              $doc_dir
      * @param string              $cache_dir
      */
-    public function __construct($mark, $doc_dir, $cache_dir)
+    public function __construct($doc_dir, $cache_dir)
     {
-        $this->commonMark = $mark;
         $this->docs       = new Local($doc_dir);
         $this->cache      = new Local($cache_dir);
     }
@@ -41,7 +39,15 @@ class CommonMark
      */
     public static function forge($doc_dir, $cache_dir)
     {
-        return new static(new CommonMarkConverter(), $doc_dir, $cache_dir);
+        return new static($doc_dir, $cache_dir);
+    }
+
+    /**
+     * @return CommonMarkConverter
+     */
+    private function makeMark()
+    {
+        return new CommonMarkConverter();
     }
 
     /**
@@ -56,8 +62,9 @@ class CommonMark
             return '';
         }
         if (!$this->cache->has($path) || $this->docs->getTimestamp($path) > $this->cache->getTimestamp($path)) {
-            $mark = $this->docs->read($path);
-            $html = $this->commonMark->convertToHtml($mark['contents']);
+            $text = $this->docs->read($path);
+            $mark = $this->makeMark();
+            $html = $mark->convertToHtml($text['contents']);
             $this->cache->write($path, $html, new Config());
             return $html;
         }
