@@ -8,11 +8,6 @@ use League\Flysystem\Config;
 class CommonMark
 {
     /**
-     * @var CommonMarkConverter
-     */
-    private $commonMark;
-
-    /**
      * @var Local
      */
     private $docs;
