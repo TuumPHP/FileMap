@@ -88,4 +88,14 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $found = $this->map->render('bad-path');
         $this->assertEmpty($found);
     }
+
+    /**
+     * @test
+     */
+    function enable_raw_outputs_raw_common_mark_text()
+    {
+        $this->map->enable_raw = true;
+        $found = $this->map->render('marked.md');
+        $this->assertEquals('# tested marked', fread($found[0], 1024));
+    }
 }

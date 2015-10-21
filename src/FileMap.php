@@ -194,6 +194,7 @@ class FileMap
     /**
      * dummy method to call private methods which are judged as unused methods.
      *
+     * @codeCoverageIgnore
      */
     protected function dummy()
     {
