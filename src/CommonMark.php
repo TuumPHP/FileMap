@@ -3,6 +3,7 @@ namespace Tuum\Locator;
 
 use League\CommonMark\CommonMarkConverter;
 use League\Flysystem\Adapter\Local;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 
 class CommonMark
@@ -18,13 +19,13 @@ class CommonMark
     private $cache;
 
     /**
-     * @param string              $doc_dir
-     * @param string              $cache_dir
+     * @param AdapterInterface              $doc_dir
+     * @param AdapterInterface              $cache_dir
      */
     public function __construct($doc_dir, $cache_dir)
     {
-        $this->docs       = new Local($doc_dir);
-        $this->cache      = new Local($cache_dir);
+        $this->docs       = $doc_dir;
+        $this->cache      = $cache_dir;
     }
 
     /**
@@ -34,6 +35,12 @@ class CommonMark
      */
     public static function forge($doc_dir, $cache_dir)
     {
+        if (is_string($doc_dir)) {
+            $doc_dir = new Local($doc_dir);
+        }
+        if (is_string($cache_dir)) {
+            $cache_dir = new Local($cache_dir);
+        }
         return new static($doc_dir, $cache_dir);
     }
 

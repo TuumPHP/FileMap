@@ -72,9 +72,12 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
             rmdir($cached_dir);
         }
         $map = FileMap::forge(__DIR__.'/map', $cached_dir);
+
         $found = $map->render('marked');
         $this->assertEquals('<h1>tested marked</h1>', trim($found[0]));
         $this->assertEquals('text/html', $found[1]);
+
+        $this->assertEquals([], $map->render('no-such'));
     }
 
     /**
