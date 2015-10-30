@@ -12,7 +12,6 @@
         >
     <testsuites>
         <testsuite name="WScore/Pile Test Suite">
-            <directory>Locator</directory>
             <directory>FileMap</directory>
             <directory>CommonMark</directory>
         </testsuite>

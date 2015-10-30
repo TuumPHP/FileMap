@@ -10,6 +10,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
+        "tuum/view": "1.x@dev",
         "league/flysystem": "~1.0",
         "league/commonmark": "~0.8",
         "league/flysystem-cached-adapter": "~1.0"

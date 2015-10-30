@@ -2,7 +2,7 @@
 namespace tests\FileMap;
 
 use Tuum\Locator\FileMap;
-use Tuum\Locator\Locator;
+use Tuum\View\Locator;
 
 class FileMapTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
 
     function setup()
     {
-        $this->map = new FileMap(new Locator(__DIR__.'/map'));
+        $this->map = FileMap::forge(__DIR__.'/map', null);
     }
 
     /**

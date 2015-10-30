@@ -1,6 +1,9 @@
 <?php
 namespace Tuum\Locator;
 
+use Tuum\View\Locator;
+use Tuum\View\LocatorInterface;
+
 class FileMap
 {
     /**
@@ -63,7 +66,7 @@ class FileMap
      * @param LocatorInterface $locator
      * @param null|CommonMark  $mark
      */
-    public function __construct($locator, $mark = null)
+    private function __construct($locator, $mark = null)
     {
         $this->locator = $locator;
         $this->markUp  = $mark;
@@ -74,13 +77,13 @@ class FileMap
      * @param string $cache_dir
      * @return FileMap
      */
-    public static function forge($docs_dir, $cache_dir)
+    public static function forge($docs_dir, $cache_dir = null)
     {
         return new FileMap(
             new Locator($docs_dir),
-            CommonMark::forge(
-                $docs_dir,
-                $cache_dir)
+            is_null($cache_dir) ?
+                null:
+                CommonMark::forge($docs_dir, $cache_dir)
         );
     }
 
