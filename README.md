@@ -1,53 +1,36 @@
-Locator
-=======
-
-a file locator and a simple renderer. 
-
-Locator
--------
-
-A simple file locator, implementing `LocatorInterface`. 
-
-Usage:
-
-```php
-$locator = Locator::forge('/path/to/files');
-$locator->addRoot('/another/path';
-$location = $locator->locate('locate/a/file');
-include($location);
-```
-
-### Locator.php
-
-Dumb and simple file locator. 
-
-### UnionManager.php
-
-Another locator using Flysystem. 
-
 FileMap
 =======
 
-a mapper for various file types. 
+a simple file mapper for various file types. 
 
-Usage:
+### License
+
+MIT License
+
+### PSR
+
+PSR-1, PSR-2, and PSR-4.
+
+
+Usage
+-----
 
 ```php
-$map = new FileMap(Locator::forge('/file/map');
-$img = $map->render('may/image/sample.jpg');
+$map = FileMap::forge(__DIR__.'/map', __DIR__.'/cache');
+$img = $map->render('images/sample.jpg');
 if (empty($img)) {
     echo 'not found';
 }
-echo $img[1]; // image/jpg
 if (is_resource($fp)) {
+    header("Content-Type: ".$img[1]); // Content-Type: image/jpg
     fpassthru($img[0]);
 }
 ```
 
-Use `render` method to find a file, which returns an array containing:
+The `render` method will find a file, then returns an array containing:
 
 *   0th: resource, or a contained text, 
-*   1st: mime type. 
+*   1st: mime type, 
 
 or returns an empty array if not found. 
 
