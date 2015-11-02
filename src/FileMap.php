@@ -1,9 +1,6 @@
 <?php
 namespace Tuum\Locator;
 
-use Tuum\View\Locator;
-use Tuum\View\LocatorInterface;
-
 class FileMap
 {
     /**
