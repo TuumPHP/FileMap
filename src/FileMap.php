@@ -9,7 +9,7 @@ class FileMap
     private $locator;
 
     /**
-     * @var null|CommonMark
+     * @var null|MarkUp
      */
     private $markUp;
 
@@ -61,7 +61,7 @@ class FileMap
 
     /**
      * @param LocatorInterface $locator
-     * @param null|CommonMark  $mark
+     * @param null|MarkUp      $mark
      */
     private function __construct($locator, $mark = null)
     {
@@ -80,7 +80,7 @@ class FileMap
             new Locator($docs_dir),
             is_null($cache_dir) ?
                 null:
-                CommonMark::forge($docs_dir, $cache_dir)
+                MarkUp::forge($docs_dir, $cache_dir)
         );
     }
 

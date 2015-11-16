@@ -6,7 +6,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 
-class CommonMark
+class MarkUp
 {
     /**
      * @var Local

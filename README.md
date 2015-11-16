@@ -1,7 +1,7 @@
 FileMap
 =======
 
-a simple file mapper for various file types. 
+a file mapper for various file types.
 
 ### License
 
@@ -16,7 +16,12 @@ Usage
 -----
 
 ```php
-$map = FileMap::forge(__DIR__.'/map', __DIR__.'/cache');
+// build file map.
+$map_dir   = __DIR__.'/map';
+$cache_dir = __DIR__.'/cache';
+$map       = Tuum\Locator\FileMap::forge($map_dir, $cache_dir);
+
+// render the file based on path.
 $img = $map->render('images/sample.jpg');
 if (empty($img)) {
     echo 'not found';
@@ -34,32 +39,56 @@ The `render` method will find a file, then returns an array containing:
 
 or returns an empty array if not found. 
 
-### emitting extensions
+### Resource or Text
 
-files for emitting as is, such as `jpg` files. 
-Finds a file for a path with extensions, such as `sample.jpg`, 
-and returns a file resource and mime-type. 
+The FileMap returns
 
-`$FileMap->emit_extensions` shows the list of the extension and associated mime-type.
+*   resource if extension is defined in $map->emit_extensions, and
+*   text if no extension in path, but found a file with extensions defined in $map->view_extensions.
 
-### viewing extensions
 
-Files for viewing as text for a path without a extension. 
-Finds a file for a path without an extension, such as `info`, 
-and renders as specified by `$FileMap->view_extensions`. 
+Emissions
+---------
+
+### Emitting Extensions
+
+The FileMap will emit the file as a resource, if
+
+*   the path contains an extension and
+*   the extension is defined in `$map->emit_extension`,
+
+such as `sample.jpg` .
+
+add extension and associated mime-type into `$map->emit_extensions` to allow more types.
+
+```php
+$map->emit_extensions['swf'] = 'application/x-shockwave-Flash';
+```
+
+### Viewing Extensions
+
+The FileMap will emit the file as a text, if
+
+*   no extension in the path, and
+*   a file exists with extensions defined in `$map->view_extensions`,
+
+such as 'content' as a path and 'content.text' exists.
 
 *   .php: evaluate as PHP. 
 *   .md: converts to html using CommonMark. 
 *   .txt, .text: get contents and renders as content. 
 
-CommonMark
+MarkUp for CommonMark
 ----------
 
-CommonMark (AKA Markdown) converter with cache. 
+`MarkUp` class converts common-mark (AKA Markdown) file to HTML.
+Construction Set markdown file root directory of markdown files, and cache directory,
 
 Usage: 
 
 ```php
-$markUp = CommonMark::forge('/path/to/md', '/cache/dir');
+$markUp = Tuum\Locator\MarkUp::forge('/path/to/md', '/cache/dir');
 $html = $markUp->getHtml('to/mark/down.md');
 ```
+
+The `$markUp` will converts the CommonMark to HTML only when cached html file is not found.

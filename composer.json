@@ -1,6 +1,6 @@
 {
     "name": "tuum/filemap",
-    "description": "a file locator and a simple container.",
+    "description": "a file mapper for various file types.",
     "license": "MIT",
     "authors": [
         {
@@ -8,10 +8,9 @@
             "email": "kamei@workspot.jp"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "league/flysystem": "~1.0",
-        "league/commonmark": "~0.8",
+        "league/commonmark": "^0.12",
         "league/flysystem-cached-adapter": "~1.0"
     },
     "repositories": [

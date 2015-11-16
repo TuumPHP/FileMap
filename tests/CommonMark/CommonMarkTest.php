@@ -2,12 +2,12 @@
 namespace tests\CommonMap;
 
 use League\Flysystem\Adapter\Local;
-use Tuum\Locator\CommonMark;
+use Tuum\Locator\MarkUp;
 
 class CommonMapTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CommonMark
+     * @var MarkUp
      */
     private $mark;
 
@@ -32,7 +32,7 @@ class CommonMapTest extends \PHPUnit_Framework_TestCase
         \file_put_contents($this->marked_file, '# tested');
         $this->cache_dir = __DIR__.'/cache';
         $this->cache = new Local($this->cache_dir);
-        $this->mark = CommonMark::forge(__DIR__, $this->cache);
+        $this->mark = MarkUp::forge(__DIR__, $this->cache);
     }
 
     function tearDown()
