@@ -85,11 +85,13 @@ class FileInfo
     }
 
     /**
+     * @param string $ext
      * @return string
      */
-    public function getPath()
+    public function getPath($ext = '')
     {
-        return $this->path;
+        $ext = $ext ? '.'.$ext: '';
+        return $this->path.$ext;
     }
 
     /**

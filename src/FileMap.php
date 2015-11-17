@@ -170,7 +170,7 @@ class FileMap
     private function handleView($found)
     {
         foreach ($this->view_extensions as $ext => $handler) {
-            if ($file_loc = $this->locator->locate($found->getPath() . '.' . $ext)) {
+            if ($file_loc = $this->locator->locate($found->getPath($ext))) {
                 $found->setFound($file_loc, $handler[1]);
                 $handle = $handler[0];
                 if (!is_callable($handle)) {
@@ -207,7 +207,7 @@ class FileMap
         if (!$this->markUp) {
             throw new \InvalidArgumentException('no converter for CommonMark file');
         }
-        $html = $this->markUp->getHtml($found->getPath() . '.' . $ext);
+        $html = $this->markUp->getHtml($found->getPath($ext));
 
         $found->setContents($html);
         return $found;
@@ -215,12 +215,11 @@ class FileMap
 
     /**
      * @param FileInfo $found
-     * @param string   $ext
      * @return array
      */
-    private function textToPre($found, $ext)
+    private function textToPre($found)
     {
-        $file_loc = $this->locator->locate($found->getPath() . '.' . $ext);
+        $file_loc = $found->getLocation();
 
         $found->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>');
         return $found;
@@ -235,6 +234,6 @@ class FileMap
     {
         $this->evaluatePhp(null);
         $this->markToHtml(null, '');
-        $this->textToPre(null, '');
+        $this->textToPre(null);
     }
 }
