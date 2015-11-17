@@ -49,14 +49,15 @@ class FileMap
     ];
     /**
      * for view/template files.
+     * array( extension => [ handle, mime-type ], ... )
      *
      * @var array
      */
     public $view_extensions = [
-        'php'  => 'evaluatePhp',
-        'md'   => 'markToHtml',
-        'txt'  => 'textToPre',
-        'text' => 'textToPre',
+        'php'  => ['evaluatePhp', 'text/html'],
+        'md'   => ['markToHtml', 'text/html'],
+        'txt'  => ['textToPre', 'text/html'],
+        'text' => ['textToPre', 'text/html'],
     ];
 
     /**
@@ -85,6 +86,29 @@ class FileMap
     }
 
     /**
+     * @param string $ext
+     * @param string $mimeType
+     * @return $this
+     */
+    public function addEmitExtension($ext, $mimeType)
+    {
+        $this->emit_extensions[$ext] = $mimeType;
+        return $this;
+    }
+
+    /**
+     * @param string          $ext
+     * @param string|callable $handle
+     * @param string          $mimeType
+     * @return $this
+     */
+    public function addViewExtension($ext, $handle, $mimeType)
+    {
+        $this->view_extensions[$ext] = [$handle, $mimeType];
+        return $this;
+    }
+
+    /**
      * returns the document contents as array of [contents, mime-type].
      * the contents maybe a resource or a text.
      *
@@ -96,7 +120,7 @@ class FileMap
     public function render($path)
     {
         $found = new FileInfo($path);
-        if ($found->getExtension()) {
+        if ($this->getMimeForEmit($found->getExtension())) {
             $found = $this->handleEmit($found);
         } else {
             $found = $this->handleView($found);
@@ -106,31 +130,41 @@ class FileMap
 
     /**
      * handles a file with proper extension such as gif, js, etc.
-     * returns array of [resource, mime].
      *
      * @param FileInfo $found
      * @return FileInfo
      */
     private function handleEmit($found)
     {
-        $emitExt = $this->emit_extensions;
-        if ($this->enable_raw) {
-            $emitExt = array_merge($emitExt, $this->raw_extensions);
-        }
-        if (!isset($emitExt[$found->getExtension()])) {
+        if (!$mime = $this->getMimeForEmit($found->getExtension())) {
             return $found;
         }
         if (!$file_loc = $this->locator->locate($found->getPath())) {
             return $found;
         }
-        $found->setFound($file_loc);
-        $mime = $emitExt[$found->getExtension()];
+        $found->setFound($file_loc, $mime);
         $fp   = fopen($file_loc, 'r');
 
-        return $found->setResource($fp, $mime);
+        $found->setResource($fp);
+        return $found;
     }
 
     /**
+     * @param string $ext
+     * @return string|null
+     */
+    private function getMimeForEmit($ext)
+    {
+        $emitExt = $this->emit_extensions;
+        if ($this->enable_raw) {
+            $emitExt = array_merge($emitExt, $this->raw_extensions);
+        }
+        return isset($emitExt[$ext]) ? $emitExt[$ext]: null;
+    }
+
+    /**
+     * handles text type file, such as html, php, text, and md.
+     *
      * @param FileInfo $found
      * @return array
      */
@@ -138,8 +172,12 @@ class FileMap
     {
         foreach ($this->view_extensions as $ext => $handler) {
             if ($file_loc = $this->locator->locate($found->getPath() . '.' . $ext)) {
-                $found->setFound($file_loc);
-                return $this->$handler($found, $ext);
+                $found->setFound($file_loc, $handler[1]);
+                $handle = $handler[0];
+                if (!is_callable($handle)) {
+                    $handle = [$this, $handle];
+                }
+                return call_user_func($handle, $found, $ext);
             }
         }
 
@@ -156,7 +194,8 @@ class FileMap
         /** @noinspection PhpIncludeInspection */
         include $found->getLocation();
         $contents = ob_get_clean();
-        return $found->setContents($contents, 'text/html');
+        $found->setContents($contents);
+        return $found;
     }
 
     /**
@@ -171,7 +210,8 @@ class FileMap
         }
         $html = $this->markUp->getHtml($found->getPath() . '.' . $ext);
 
-        return $found->setContents($html, 'text/html');
+        $found->setContents($html);
+        return $found;
     }
 
     /**
@@ -183,7 +223,8 @@ class FileMap
     {
         $file_loc = $this->locator->locate($found->getPath() . '.' . $ext);
 
-        return $found->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>', 'text/html');
+        $found->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>');
+        return $found;
     }
 
     /**
