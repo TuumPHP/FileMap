@@ -91,15 +91,15 @@ class FileMap
      * returns empty array, [], if no file is mapped.
      *
      * @param string $path
-     * @return array
+     * @return FileInfo
      */
     public function render($path)
     {
-        $ext  = pathinfo($path, PATHINFO_EXTENSION);
-        if ($ext) {
-            $found = $this->handleEmit($path, $ext);
+        $found = new FileInfo($path);
+        if ($found->getExtension()) {
+            $found = $this->handleEmit($found);
         } else {
-            $found = $this->handleView($path);
+            $found = $this->handleView($found);
         }
         return $found;
     }
@@ -108,87 +108,82 @@ class FileMap
      * handles a file with proper extension such as gif, js, etc.
      * returns array of [resource, mime].
      *
-     * @param string $path
-     * @param string $ext
-     * @return array
+     * @param FileInfo $found
+     * @return FileInfo
      */
-    private function handleEmit($path, $ext)
+    private function handleEmit($found)
     {
         $emitExt = $this->emit_extensions;
         if ($this->enable_raw) {
             $emitExt = array_merge($emitExt, $this->raw_extensions);
         }
-        if (!isset($emitExt[$ext])) {
-            return [];
+        if (!isset($emitExt[$found->getExtension()])) {
+            return $found;
         }
-        if (!$file_loc = $this->locator->locate($path)) {
-            return [];
+        if (!$file_loc = $this->locator->locate($found->getPath())) {
+            return $found;
         }
-        $mime = $emitExt[$ext];
+        $found->setFound($file_loc);
+        $mime = $emitExt[$found->getExtension()];
         $fp   = fopen($file_loc, 'r');
 
-        return [$fp, $mime];
+        return $found->setResource($fp, $mime);
     }
 
     /**
-     * @param string $path
+     * @param FileInfo $found
      * @return array
      */
-    private function handleView($path)
+    private function handleView($found)
     {
         foreach ($this->view_extensions as $ext => $handler) {
-            if ($file_loc = $this->locator->locate($path . '.' . $ext)) {
-                $info = [
-                    'loc'  => $file_loc,
-                    'path' => $path,
-                    'ext'  => $ext,
-                ];
-                return $this->$handler($info);
+            if ($file_loc = $this->locator->locate($found->getPath() . '.' . $ext)) {
+                $found->setFound($file_loc);
+                return $this->$handler($found, $ext);
             }
         }
 
-        return [];
+        return $found;
     }
 
     /**
-     * @param array $info
+     * @param FileInfo $found
      * @return array
      */
-    private function evaluatePhp(array $info)
+    private function evaluatePhp($found)
     {
         ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $info['loc'];
+        include $found->getLocation();
         $contents = ob_get_clean();
-        return [$contents, 'text/html'];
+        return $found->setContents($contents, 'text/html');
     }
 
     /**
-     * @param array $info
+     * @param FileInfo $found
+     * @param string   $ext
      * @return array
      */
-    private function markToHtml(array $info)
+    private function markToHtml($found, $ext)
     {
-        $path = $info['path'];
-        $ext  = $info['ext'];
         if (!$this->markUp) {
             throw new \InvalidArgumentException('no converter for CommonMark file');
         }
-        $html = $this->markUp->getHtml($path . '.' . $ext);
+        $html = $this->markUp->getHtml($found->getPath() . '.' . $ext);
 
-        return [$html, 'text/html'];
+        return $found->setContents($html, 'text/html');
     }
 
     /**
-     * @param array $info
+     * @param FileInfo $found
+     * @param string   $ext
      * @return array
      */
-    private function textToPre(array $info)
+    private function textToPre($found, $ext)
     {
-        $path     = $info['path'];
-        $ext      = $info['ext'];
-        $file_loc = $this->locator->locate($path . '.' . $ext);
-        return ['<pre>' . \file_get_contents($file_loc) . '</pre>', 'text/html'];
+        $file_loc = $this->locator->locate($found->getPath() . '.' . $ext);
+
+        return $found->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>', 'text/html');
     }
 
     /**
@@ -198,8 +193,8 @@ class FileMap
      */
     protected function dummy()
     {
-        $this->evaluatePhp([]);
-        $this->markToHtml([]);
-        $this->textToPre([]);
+        $this->evaluatePhp(null);
+        $this->markToHtml(null, '');
+        $this->textToPre(null, '');
     }
 }

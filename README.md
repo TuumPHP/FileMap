@@ -22,33 +22,32 @@ $cache_dir = __DIR__.'/cache';
 $map       = Tuum\Locator\FileMap::forge($map_dir, $cache_dir);
 
 // render the file based on path.
-$img = $map->render('images/sample.jpg');
-if (empty($img)) {
+$found = $map->render('images/sample.jpg');
+if (!$found->found()) {
     echo 'not found';
 }
-if (is_resource($fp)) {
+if ($fp = $found->getResource()) {
     header("Content-Type: ".$img[1]); // Content-Type: image/jpg
-    fpassthru($img[0]);
+    fpassthru($fp);
 }
 ```
 
-The `render` method will find a file, then returns an array containing:
+The `render` method will find a file, then returns an `FileInfo` object which has methods like:
 
-*   0th: resource, or a contained text, 
-*   1st: mime type, 
-
-or returns an empty array if not found. 
-
-### Resource or Text
-
-The FileMap returns
-
-*   resource if extension is defined in $map->emit_extensions, and
-*   text if no extension in path, but found a file with extensions defined in $map->view_extensions.
+*   `FileInfo::found(): bool`: returns if a file for a given path is found. 
+*   `FileInfo::getResource(): resource|null`: returns a resource for images, etc.
+*   `FileInfo::getContents(): string`: returns a contents of a text files.
+*   `FileInfo::getMimeType(): string|null`: returns a mime types for the file.
 
 
 Emissions
 ---------
+
+The FileMap returns 
+
+*   resource if extension is defined in `$map->emit_extensions`, and
+*   text if no extension in path, but found a file with extensions defined in `$map->view_extensions`.
+
 
 ### Emitting Extensions
 

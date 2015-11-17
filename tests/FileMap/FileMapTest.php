@@ -1,8 +1,8 @@
 <?php
 namespace tests\FileMap;
 
+use Tuum\Locator\FileInfo;
 use Tuum\Locator\FileMap;
-use Tuum\View\Locator;
 
 class FileMapTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,10 +22,10 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     function jpg_path_gets_resource()
     {
         $found = $this->map->render('test.jpg');
-        $this->assertNotEmpty($found);
-        $this->assertTrue(is_resource($found[0]));
-        $this->assertEquals('image/jpeg', $found[1]);
-        $this->assertEquals('test.jpg', basename(stream_get_meta_data($found[0])["uri"]));
+        $this->assertTrue($found instanceof FileInfo);
+        $this->assertTrue(is_resource($found->getResource()));
+        $this->assertEquals('image/jpeg', $found->getMimeType());
+        $this->assertEquals('test.jpg', basename($found->getLocation()));
     }
 
     /**
@@ -34,7 +34,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     function invalid_ext_path_returns_empty_array()
     {
         $found = $this->map->render('test.bad-ext');
-        $this->assertEmpty($found);
+        $this->assertFalse($found->found());
     }
 
     /**
@@ -44,8 +44,8 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     {
         $found = $this->map->render('evaluate');
         $this->assertNotEmpty($found);
-        $this->assertEquals('tested evaluate', $found[0]);
-        $this->assertEquals('text/html', $found[1]);
+        $this->assertEquals('tested evaluate', $found->getContents());
+        $this->assertEquals('text/html', $found->getMimeType());
     }
 
     /**
@@ -55,8 +55,8 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     {
         $found = $this->map->render('text');
         $this->assertNotEmpty($found);
-        $this->assertEquals('<pre>tested text</pre>', $found[0]);
-        $this->assertEquals('text/html', $found[1]);
+        $this->assertEquals('<pre class="FileMap__text-to-pre">tested text</pre>', $found->getContents());
+        $this->assertEquals('text/html', $found->getMimeType());
     }
 
     /**
@@ -74,10 +74,10 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $map = FileMap::forge(__DIR__.'/map', $cached_dir);
 
         $found = $map->render('marked');
-        $this->assertEquals('<h1>tested marked</h1>', trim($found[0]));
-        $this->assertEquals('text/html', $found[1]);
+        $this->assertEquals('<h1>tested marked</h1>', trim($found->getContents()));
+        $this->assertEquals('text/html', $found->getMimeType());
 
-        $this->assertEquals([], $map->render('no-such'));
+        $this->assertFalse($map->render('no-such')->found());
     }
 
     /**
@@ -86,7 +86,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     function invalid_view_path_returns_empty_array()
     {
         $found = $this->map->render('bad-path');
-        $this->assertEmpty($found);
+        $this->assertEmpty($found->found());
     }
 
     /**
@@ -96,6 +96,6 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
     {
         $this->map->enable_raw = true;
         $found = $this->map->render('marked.md');
-        $this->assertEquals('# tested marked', fread($found[0], 1024));
+        $this->assertEquals('# tested marked', fread($found->getResource(), 1024));
     }
 }
