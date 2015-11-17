@@ -120,12 +120,11 @@ class FileMap
     public function render($path)
     {
         $found = new FileInfo($path);
-        if ($this->getMimeForEmit($found->getExtension())) {
-            $found = $this->handleEmit($found);
-        } else {
-            $found = $this->handleView($found);
+        $found = $this->handleEmit($found);
+        if ($found->found()) {
+            return $found;
         }
-        return $found;
+        return $this->handleView($found);
     }
 
     /**

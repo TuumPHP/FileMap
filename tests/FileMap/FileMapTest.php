@@ -98,4 +98,27 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
         $found = $this->map->render('marked.md');
         $this->assertEquals('# tested marked', fread($found->getResource(), 1024));
     }
+
+    /**
+     * @test
+     */
+    function addViewExtension_handles_text_differently()
+    {
+        $this->map->addViewExtension('text', function(FileInfo $found) {
+            $found->setContents(file_get_contents($found->getLocation()).' from closure');
+            return $found;
+        }, 'text/vanilla');
+        $found = $this->map->render('text');
+        $this->assertEquals('tested text from closure', $found->getContents());
+    }
+
+    /**
+     * @test
+     */
+    function addEmitExtension_with_empty_mime_will_disable_for_the_extension()
+    {
+        $this->map->addEmitExtension('jpg', '');
+        $found = $this->map->render('test.jpg');
+        $this->assertFalse($found->found());
+    }
 }

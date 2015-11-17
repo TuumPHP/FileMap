@@ -53,7 +53,7 @@ class FileInfo
      * @param string $location
      * @param string $mime
      */
-    public function setFound($location, $mime = null)
+    public function setFound($location, $mime)
     {
         $this->location = $location;
         $this->found    = true;
@@ -70,22 +70,18 @@ class FileInfo
 
     /**
      * @param resource $resource
-     * @param string   $mime
      */
-    public function setResource($resource, $mime = null)
+    public function setResource($resource)
     {
         $this->resource = $resource;
-        $this->mimeType = $mime ?: $this->mimeType;
     }
 
     /**
      * @param string $contents
-     * @param string $mime
      */
-    public function setContents($contents, $mime = null)
+    public function setContents($contents)
     {
         $this->contents = $contents;
-        $this->mimeType = $mime ?: $this->mimeType;
     }
 
     /**
@@ -137,13 +133,5 @@ class FileInfo
             return stream_get_contents($this->resource);
         }
         return $this->contents;
-    }
-
-    /**
-     * @param string $mimeType
-     */
-    public function setMimeType($mimeType)
-    {
-        $this->mimeType = $mimeType;
     }
 }
