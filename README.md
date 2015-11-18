@@ -1,7 +1,9 @@
 FileMap
 =======
 
-a file mapper for various file types.
+A file mapper that maps a path to various file types, such as images, text, and markdown file.
+
+finds a file based on a given path, and returns the file resource or contents (string), associated mime-type, and other information. 
 
 ### License
 
@@ -16,66 +18,88 @@ Usage
 -----
 
 ```php
-// build file map.
-$map_dir   = __DIR__.'/map';
-$cache_dir = __DIR__.'/cache';
-$map       = Tuum\Locator\FileMap::forge($map_dir, $cache_dir);
+$map = Tuum\Locator\FileMap::forge(
+    __DIR__.'/map',   // root dir where mapped files exist. 
+    __DIR__.'/cache'  // give cache dir to convert md files.
+);
 
 // render the file based on path.
 $found = $map->render('images/sample.jpg');
 if (!$found->found()) {
     echo 'not found';
 }
+header('Content-Type: '.$found->getMimeType());
 if ($fp = $found->getResource()) {
-    header("Content-Type: ".$img[1]); // Content-Type: image/jpg
     fpassthru($fp);
+} else {
+    echo $found->getContents();
 }
 ```
 
 The `render` method will find a file, then returns an `FileInfo` object which has methods like:
 
-*   `FileInfo::found(): bool`: returns if a file for a given path is found. 
-*   `FileInfo::getResource(): resource|null`: returns a resource for images, etc.
-*   `FileInfo::getContents(): string`: returns a contents of a text files.
-*   `FileInfo::getMimeType(): string|null`: returns a mime types for the file.
+### `FileInfo` Object
 
+FileInfor have methods such as:
+
+*   `FileInfo::found(): bool`: returns if a file for a given path is found. 
+*   `FileInfo::getMimeType(): string|null`: returns a mime types for the file.
+*   `FileInfo::getResource(): resource|null`: returns a resource for images, etc.
+*   `FileInfo::getContents(): string`: returns a contents of a text files. if a resource is given, this methods returns the content of the file resource. 
+
+depending on the type of file, the `FileInfo` object may have a file resource or a file's contents as string. Try retriving a file resource first, then file contents if no resource is found. 
 
 Emissions
 ---------
 
-The FileMap returns 
-
-*   resource if extension is defined in `$map->emit_extensions`, and
-*   text if no extension in path, but found a file with extensions defined in `$map->view_extensions`.
-
-
-### Emitting Extensions
+### Emitting based on Extensions
 
 The FileMap will emit the file as a resource, if
 
-*   the path contains an extension and
-*   the extension is defined in `$map->emit_extension`,
+*   the path has an extension (i.e. `sample.jpg`), and
+*   the extension is defined in `$map->emit_extension`, and 
+*   found the file at the path. 
 
-such as `sample.jpg` .
-
-add extension and associated mime-type into `$map->emit_extensions` to allow more types.
+The following list some of the predefined extensions and associated mime-type:
 
 ```php
-$map->emit_extensions['swf'] = 'application/x-shockwave-Flash';
+    public $emit_extensions = [
+        'pdf'  => 'application/pdf',
+        'gif'  => 'image/gif',
+    ];
 ```
 
-### Viewing Extensions
+To add your extensions, 
 
-The FileMap will emit the file as a text, if
+```php
+$map->addEmitExtension('swf', 'application/x-shockwave-Flash');
+```
 
-*   no extension in the path, and
-*   a file exists with extensions defined in `$map->view_extensions`,
+### Viewing File Content
 
-such as 'content' as a path and 'content.text' exists.
+The FileMap will emit the file content as a text, if
 
-*   .php: evaluate as PHP. 
-*   .md: converts to html using CommonMark. 
-*   .txt, .text: get contents and renders as content. 
+*   not handled by the emitting by extension, and
+*   a file exists with extensions defined in `$map->view_extensions`. 
+
+To add an extension for viewing files,
+
+```php
+$map->addViewExtension('twig', 
+    function(FileInfo $found) use($twig) {
+        $found->setContents($twig->render($found->getLocation()));
+        return $found;
+    }, 
+    'text/html');
+```
+
+The following shows the pre-defined extensions and the behavior of rendering. In all cases, it returns mime-type as `text/html`.
+
+*   .php: evaluate the file as PHP. 
+*   .txt, .text: get contents and put the string inside `<pre>` html tag. 
+*   .md: converts the file to html using `MarkUp` object. 
+
+
 
 MarkUp for CommonMark
 ----------
