@@ -64,7 +64,7 @@ class FileMap
      * @param LocatorInterface $locator
      * @param null|MarkUp      $mark
      */
-    private function __construct($locator, $mark = null)
+    public function __construct($locator, $mark = null)
     {
         $this->locator = $locator;
         $this->markUp  = $mark;
