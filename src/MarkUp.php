@@ -63,11 +63,13 @@ class MarkUp
         if (!$this->docs->has($path)) {
             return '';
         }
-        if (!$this->cache->has($path) || $this->docs->getTimestamp($path) > $this->cache->getTimestamp($path)) {
+        if (!$this->cache || !$this->cache->has($path) || $this->docs->getTimestamp($path) > $this->cache->getTimestamp($path)) {
             $text = $this->docs->read($path);
             $mark = $this->makeMark();
             $html = $mark->convertToHtml($text['contents']);
-            $this->cache->write($path, $html, new Config());
+            if ($this->cache) {
+                $this->cache->write($path, $html, new Config());
+            }
             return $html;
         }
         $contents = $this->cache->read($path);
