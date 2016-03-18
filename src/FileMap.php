@@ -23,6 +23,7 @@ class FileMap
         'gif'  => 'image/gif',
         'jpg'  => 'image/jpeg',
         'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
         'htm'  => 'text/html',
         'html' => 'text/html',
         'txt'  => 'text/plain',
