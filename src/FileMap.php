@@ -68,17 +68,17 @@ class FileMap
      */
     public function render($path)
     {
-        $found = new FileInfo($path);
-        $handlers = $this->handlers;
+        $file       = new FileInfo($path);
+        $handlers   = $this->handlers;
         $handlers[] = $this->emitter;
         $handlers[] = $this->renderer;
 
         foreach($handlers as $handle) {
-            $found = $handle->handle($found);
-            if ($found->found()) {
-                return $found;
+            $file = $handle->handle($file);
+            if ($file->found()) {
+                return $file;
             }
         }
-        return $found;
+        return $file;
     }
 }

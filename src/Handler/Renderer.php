@@ -65,67 +65,67 @@ class Renderer implements HandlerInterface
     /**
      * handles text type file, such as html, php, text, and md.
      *
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @return FileInfo
      */
-    public function handle($found)
+    public function handle($file)
     {
         foreach ($this->view_extensions as $ext => $handler) {
-            if ($file_loc = $this->locator->locate($found->getPath($ext))) {
-                $found->setLocation($file_loc);
-                $found->setMime($handler[1]);
-                $found->setFound();
+            if ($file_loc = $this->locator->locate($file->getPath($ext))) {
+                $file->setLocation($file_loc);
+                $file->setMime($handler[1]);
+                $file->setFound();
                 $handle = $handler[0];
                 if (!is_callable($handle)) {
                     $handle = [$this, $handle];
                 }
-                return call_user_func($handle, $found, $ext);
+                return call_user_func($handle, $file, $ext);
             }
         }
 
-        return $found;
+        return $file;
     }
 
     /**
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @return FileInfo
      */
-    private function evaluatePhp($found)
+    private function evaluatePhp($file)
     {
         ob_start();
         /** @noinspection PhpIncludeInspection */
-        include $found->getLocation();
+        include $file->getLocation();
         $contents = ob_get_clean();
-        $found->setContents($contents);
-        return $found;
+        $file->setContents($contents);
+        return $file;
     }
 
     /**
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @param string   $ext
      * @return FileInfo
      */
-    private function markToHtml($found, $ext)
+    private function markToHtml($file, $ext)
     {
         if (!$this->markUp) {
             throw new \InvalidArgumentException('no converter for CommonMark file');
         }
-        $html = $this->markUp->getHtml($found->getPath($ext));
+        $html = $this->markUp->getHtml($file->getPath($ext));
 
-        $found->setContents($html);
-        return $found;
+        $file->setContents($html);
+        return $file;
     }
 
     /**
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @return FileInfo
      */
-    private function textToPre($found)
+    private function textToPre($file)
     {
-        $file_loc = $found->getLocation();
+        $file_loc = $file->getLocation();
 
-        $found->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>');
-        return $found;
+        $file->setContents('<pre class="FileMap__text-to-pre">' . \file_get_contents($file_loc).'</pre>');
+        return $file;
     }
 
     /**

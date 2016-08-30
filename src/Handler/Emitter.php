@@ -77,24 +77,24 @@ class Emitter implements HandlerInterface
     /**
      * handles a file with proper extension such as gif, js, etc.
      *
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @return FileInfo
      */
-    public function handle($found)
+    public function handle($file)
     {
-        if (!$mime = $this->getMimeForEmit($found->getExtension())) {
-            return $found;
+        if (!$mime = $this->getMimeForEmit($file->getExtension())) {
+            return $file;
         }
-        if (!$file_loc = $this->locator->locate($found->getPath())) {
-            return $found;
+        if (!$file_loc = $this->locator->locate($file->getPath())) {
+            return $file;
         }
-        $found->setLocation($file_loc);
-        $found->setMime($mime);
-        $found->setFound();
+        $file->setLocation($file_loc);
+        $file->setMime($mime);
+        $file->setFound();
         $fp   = fopen($file_loc, 'r');
-        $found->setResource($fp);
+        $file->setResource($fp);
 
-        return $found;
+        return $file;
     }
 
     /**

@@ -9,8 +9,8 @@ interface HandlerInterface
     /**
      * handles a $file.
      *
-     * @param FileInfo $found
+     * @param FileInfo $file
      * @return FileInfo
      */
-    public function handle($found);
+    public function handle($file);
 }
