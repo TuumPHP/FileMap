@@ -166,7 +166,7 @@ class FileMap
      * handles text type file, such as html, php, text, and md.
      *
      * @param FileInfo $found
-     * @return array
+     * @return FileInfo
      */
     private function handleView($found)
     {
@@ -186,7 +186,7 @@ class FileMap
 
     /**
      * @param FileInfo $found
-     * @return array
+     * @return FileInfo
      */
     private function evaluatePhp($found)
     {
@@ -201,7 +201,7 @@ class FileMap
     /**
      * @param FileInfo $found
      * @param string   $ext
-     * @return array
+     * @return FileInfo
      */
     private function markToHtml($found, $ext)
     {
@@ -216,7 +216,7 @@ class FileMap
 
     /**
      * @param FileInfo $found
-     * @return array
+     * @return FileInfo
      */
     private function textToPre($found)
     {
