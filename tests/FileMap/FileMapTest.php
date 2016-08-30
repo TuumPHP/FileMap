@@ -94,7 +94,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
      */
     function enable_raw_outputs_raw_common_mark_text()
     {
-        $this->map->enable_raw = true;
+        $this->map->emitter->enable_raw = true;
         $found = $this->map->render('marked.md');
         $this->assertEquals('# tested marked', fread($found->getResource(), 1024));
     }
@@ -117,7 +117,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
      */
     function addEmitExtension_with_empty_mime_will_disable_for_the_extension()
     {
-        $this->map->addEmitExtension('jpg', '');
+        $this->map->emitter->addEmitExtension('jpg', '');
         $found = $this->map->render('test.jpg');
         $this->assertFalse($found->found());
     }

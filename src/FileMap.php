@@ -1,6 +1,8 @@
 <?php
 namespace Tuum\Locator;
 
+use Tuum\Locator\Handler\Emitter;
+
 class FileMap
 {
     /**
@@ -54,7 +56,7 @@ class FileMap
      *
      * @var array
      */
-    public $view_extensions = [
+    public  $view_extensions = [
         'php'  => ['evaluatePhp', 'text/html'],
         'md'   => ['markToHtml', 'text/html'],
         'txt'  => ['textToPre', 'text/html'],
@@ -62,12 +64,19 @@ class FileMap
     ];
 
     /**
+     * @var Emitter
+     */
+    public $emitter;
+
+    /**
      * @param LocatorInterface $locator
+     * @param Emitter          $emitter
      * @param null|MarkUp      $mark
      */
-    public function __construct($locator, $mark = null)
+    public function __construct($locator, $emitter, $mark = null)
     {
         $this->locator = $locator;
+        $this->emitter = $emitter;
         $this->markUp  = $mark;
     }
 
@@ -78,23 +87,14 @@ class FileMap
      */
     public static function forge($docs_dir, $cache_dir = null)
     {
+        $locator = new Locator($docs_dir);
         return new FileMap(
-            new Locator($docs_dir),
-            is_null($cache_dir) ?
+            $locator,
+            new Emitter($locator),
+            is_null($docs_dir) ?
                 null:
                 MarkUp::forge($docs_dir, $cache_dir)
         );
-    }
-
-    /**
-     * @param string $ext
-     * @param string $mimeType
-     * @return $this
-     */
-    public function addEmitExtension($ext, $mimeType)
-    {
-        $this->emit_extensions[$ext] = $mimeType;
-        return $this;
     }
 
     /**
@@ -121,45 +121,11 @@ class FileMap
     public function render($path)
     {
         $found = new FileInfo($path);
-        $found = $this->handleEmit($found);
+        $found = $this->emitter->handle($found);
         if ($found->found()) {
             return $found;
         }
         return $this->handleView($found);
-    }
-
-    /**
-     * handles a file with proper extension such as gif, js, etc.
-     *
-     * @param FileInfo $found
-     * @return FileInfo
-     */
-    private function handleEmit($found)
-    {
-        if (!$mime = $this->getMimeForEmit($found->getExtension())) {
-            return $found;
-        }
-        if (!$file_loc = $this->locator->locate($found->getPath())) {
-            return $found;
-        }
-        $found->setFound($file_loc, $mime);
-        $fp   = fopen($file_loc, 'r');
-
-        $found->setResource($fp);
-        return $found;
-    }
-
-    /**
-     * @param string $ext
-     * @return string|null
-     */
-    private function getMimeForEmit($ext)
-    {
-        $emitExt = $this->emit_extensions;
-        if ($this->enable_raw) {
-            $emitExt = array_merge($emitExt, $this->raw_extensions);
-        }
-        return isset($emitExt[$ext]) ? $emitExt[$ext]: null;
     }
 
     /**
