@@ -16,4 +16,9 @@
             <directory>CommonMark</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist>
+            <directory processUncoveredFilesFromWhitelist="true">../src</directory>
+        </whitelist>
+    </filter>
 </phpunit>

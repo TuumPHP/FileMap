@@ -12,7 +12,7 @@ use Tuum\Locator\LocatorInterface;
  *
  * @package Tuum\Locator\Handler
  */
-class Emitter
+class Emitter implements HandlerInterface
 {
     /**
      * @var LocatorInterface

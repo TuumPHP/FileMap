@@ -2,6 +2,7 @@
 namespace Tuum\Locator;
 
 use Tuum\Locator\Handler\Emitter;
+use Tuum\Locator\Handler\HandlerInterface;
 use Tuum\Locator\Handler\Renderer;
 
 class FileMap
@@ -14,7 +15,12 @@ class FileMap
     /**
      * @var Renderer
      */
-    public $renderer;
+    public  $renderer;
+
+    /**
+     * @var HandlerInterface[]
+     */
+    private $handlers;
 
     /**
      * @param Emitter          $emitter
@@ -24,6 +30,14 @@ class FileMap
     {
         $this->emitter  = $emitter;
         $this->renderer = $renderer;
+    }
+
+    /**
+     * @param HandlerInterface $handle
+     */
+    public function addHandler(HandlerInterface $handle)
+    {
+        $this->handlers[] = $handle;
     }
 
     /**
@@ -55,10 +69,16 @@ class FileMap
     public function render($path)
     {
         $found = new FileInfo($path);
-        $found = $this->emitter->handle($found);
-        if ($found->found()) {
-            return $found;
+        $handlers = $this->handlers;
+        $handlers[] = $this->emitter;
+        $handlers[] = $this->renderer;
+
+        foreach($handlers as $handle) {
+            $found = $handle->handle($found);
+            if ($found->found()) {
+                return $found;
+            }
         }
-        return $this->renderer->handle($found);
+        return $found;
     }
 }

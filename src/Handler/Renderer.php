@@ -15,7 +15,7 @@ use Tuum\Locator\MarkUp;
  *
  * @package Tuum\Locator\Handler
  */
-class Renderer
+class Renderer implements HandlerInterface
 {
     /**
      * @var LocatorInterface
