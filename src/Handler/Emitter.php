@@ -88,10 +88,12 @@ class Emitter implements HandlerInterface
         if (!$file_loc = $this->locator->locate($found->getPath())) {
             return $found;
         }
-        $found->setFound($file_loc, $mime);
+        $found->setLocation($file_loc);
+        $found->setMime($mime);
+        $found->setFound();
         $fp   = fopen($file_loc, 'r');
-
         $found->setResource($fp);
+
         return $found;
     }
 

@@ -39,6 +39,11 @@ class FileInfo
     private $mimeType;
 
     /**
+     * @var mixed
+     */
+    private $misc;
+
+    /**
      * FileInfo constructor.
      *
      * @param string $path
@@ -50,13 +55,26 @@ class FileInfo
     }
 
     /**
-     * @param string $location
-     * @param string $mime
+     * 
      */
-    public function setFound($location, $mime)
+    public function setFound()
+    {
+        $this->found    = true;
+    }
+
+    /**
+     * @param string $location
+     */
+    public function setLocation($location)
     {
         $this->location = $location;
-        $this->found    = true;
+    }
+
+    /**
+     * @param string $mime
+     */
+    public function setMime($mime)
+    {
         $this->mimeType = $mime ?: $this->mimeType;
     }
 
@@ -65,7 +83,7 @@ class FileInfo
      */
     public function found()
     {
-        return $this->found;
+        return $this->found !== false;
     }
 
     /**
@@ -135,5 +153,21 @@ class FileInfo
             return stream_get_contents($this->resource);
         }
         return $this->contents;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMisc()
+    {
+        return $this->misc;
+    }
+
+    /**
+     * @param mixed $misc
+     */
+    public function setMisc($misc)
+    {
+        $this->misc = $misc;
     }
 }

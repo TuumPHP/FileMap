@@ -72,7 +72,9 @@ class Renderer implements HandlerInterface
     {
         foreach ($this->view_extensions as $ext => $handler) {
             if ($file_loc = $this->locator->locate($found->getPath($ext))) {
-                $found->setFound($file_loc, $handler[1]);
+                $found->setLocation($file_loc);
+                $found->setMime($handler[1]);
+                $found->setFound();
                 $handle = $handler[0];
                 if (!is_callable($handle)) {
                     $handle = [$this, $handle];
