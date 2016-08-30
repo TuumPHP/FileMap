@@ -104,7 +104,7 @@ class FileMapTest extends \PHPUnit_Framework_TestCase
      */
     function addViewExtension_handles_text_differently()
     {
-        $this->map->addViewExtension('text', function(FileInfo $found) {
+        $this->map->renderer->addViewExtension('text', function(FileInfo $found) {
             $found->setContents(file_get_contents($found->getLocation()).' from closure');
             return $found;
         }, 'text/vanilla');
