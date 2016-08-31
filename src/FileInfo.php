@@ -87,6 +87,14 @@ class FileInfo
     }
 
     /**
+     * @return bool
+     */
+    public function isDir()
+    {
+        return $this->locator->isDirectory($this->path);
+    }
+
+    /**
      * 
      */
     public function setFound()

@@ -15,6 +15,16 @@ class Locator implements LocatorInterface
         }
         $this->root = $root;
     }
+
+    /**
+     * @param string $file
+     * @return string
+     */
+    private function getLocation($file)
+    {
+        $file = substr($file,0,1) ==='/' ? substr($file,1) : $file;
+        return $this->root . $file;
+    }
     
     /**
      * @param string $file
@@ -22,10 +32,21 @@ class Locator implements LocatorInterface
      */
     public function locate($file)
     {
-        $file = substr($file,0,1) ==='/' ? substr($file,1) : $file;
-        $location = $this->root . $file;
+        $location = $this->getLocation($file);
         if (file_exists($location)) {
             return $location;
+        }
+        return false;
+    }
+
+    /**
+     * @param string $file
+     * @return bool
+     */
+    public function isDirectory($file)
+    {
+        if ($location = $this->locate($file)) {
+            return is_dir($location);
         }
         return false;
     }

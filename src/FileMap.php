@@ -28,15 +28,33 @@ class FileMap
     private $locator;
 
     /**
+     * a handler in case $path points to a directory.
+     * callable(FileInfo $file): FileInfo
+     *
+     * @var callable
+     */
+    public $dirHandler;
+
+    /**
+     * default directory index file name in case $path
+     * points to a directory. i.e.
+     * $path = $path . '/' . $directoryIndex.
+     *
+     * @var string
+     */
+    public $directoryIndex = 'index';
+
+    /**
      * @param LocatorInterface $locator
      * @param Emitter          $emitter
      * @param Renderer         $renderer
      */
     public function __construct(LocatorInterface $locator, $emitter, $renderer)
     {
-        $this->locator  = $locator;
-        $this->emitter  = $emitter;
-        $this->renderer = $renderer;
+        $this->locator    = $locator;
+        $this->emitter    = $emitter;
+        $this->renderer   = $renderer;
+        $this->dirHandler = [$this, 'handleDirectory'];
     }
 
     /**
@@ -77,7 +95,12 @@ class FileMap
      */
     public function render($path)
     {
+        $path       = trim($path, "/ \t\n\r\x0B");
         $file       = new FileInfo($this->locator, $path);
+        if ($file->isDir()) {
+            $file = call_user_func($this->dirHandler, $file);
+        }
+
         /** @var HandlerInterface[] $handlers */
         $handlers   = $this->handlers;
         $handlers[] = $this->emitter;
@@ -90,5 +113,14 @@ class FileMap
             }
         }
         return $file;
+    }
+
+    /**
+     * @param FileInfo $file
+     * @return FileInfo
+     */
+    public function handleDirectory($file)
+    {
+        return $file->withPath($file->getPath().'/'.$this->directoryIndex);
     }
 }
