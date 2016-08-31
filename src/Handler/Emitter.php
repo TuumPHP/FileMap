@@ -15,11 +15,6 @@ use Tuum\Locator\LocatorInterface;
 class Emitter implements HandlerInterface
 {
     /**
-     * @var LocatorInterface
-     */
-    private $locator;
-
-    /**
      * specify the extension => mime type.
      *
      * @var array
@@ -56,11 +51,10 @@ class Emitter implements HandlerInterface
     ];
 
     /**
-     * @param LocatorInterface $locator
+     *
      */
-    public function __construct(LocatorInterface $locator)
+    public function __construct()
     {
-        $this->locator = $locator;
     }
 
     /**
@@ -85,10 +79,9 @@ class Emitter implements HandlerInterface
         if (!$mime = $this->getMimeForEmit($file->getExtension())) {
             return $file;
         }
-        if (!$file_loc = $this->locator->locate($file->getPath())) {
+        if (!$file_loc = $file->getLocation()) {
             return $file;
         }
-        $file->setLocation($file_loc);
         $file->setMime($mime);
         $file->setFound();
         $fp   = fopen($file_loc, 'r');

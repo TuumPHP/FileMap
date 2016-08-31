@@ -23,11 +23,18 @@ class FileMap
     private $handlers;
 
     /**
+     * @var LocatorInterface
+     */
+    private $locator;
+
+    /**
+     * @param LocatorInterface $locator
      * @param Emitter          $emitter
      * @param Renderer         $renderer
      */
-    public function __construct($emitter, $renderer)
+    public function __construct(LocatorInterface $locator, $emitter, $renderer)
     {
+        $this->locator  = $locator;
         $this->emitter  = $emitter;
         $this->renderer = $renderer;
     }
@@ -48,12 +55,14 @@ class FileMap
     public static function forge($docs_dir, $cache_dir = null)
     {
         $locator = new Locator($docs_dir);
+        $markUp  = is_null($docs_dir) ?
+            null:
+            MarkUp::forge($docs_dir, $cache_dir);
+
         return new FileMap(
-            new Emitter($locator),
-            new Renderer($locator, is_null($docs_dir) ?
-                null:
-                MarkUp::forge($docs_dir, $cache_dir)
-            )
+            $locator,
+            new Emitter(),
+            new Renderer($markUp)
         );
     }
 
@@ -68,7 +77,8 @@ class FileMap
      */
     public function render($path)
     {
-        $file       = new FileInfo($path);
+        $file       = new FileInfo($this->locator, $path);
+        /** @var HandlerInterface[] $handlers */
         $handlers   = $this->handlers;
         $handlers[] = $this->emitter;
         $handlers[] = $this->renderer;

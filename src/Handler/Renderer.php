@@ -18,11 +18,6 @@ use Tuum\Locator\MarkUp;
 class Renderer implements HandlerInterface
 {
     /**
-     * @var LocatorInterface
-     */
-    private $locator;
-
-    /**
      * @var null|MarkUp
      */
     private $markUp;
@@ -41,12 +36,10 @@ class Renderer implements HandlerInterface
     ];
 
     /**
-     * @param LocatorInterface $locator
      * @param null|MarkUp      $mark
      */
-    public function __construct($locator, $mark = null)
+    public function __construct($mark = null)
     {
-        $this->locator = $locator;
         $this->markUp  = $mark;
     }
 
@@ -71,15 +64,15 @@ class Renderer implements HandlerInterface
     public function handle($file)
     {
         foreach ($this->view_extensions as $ext => $handler) {
-            if ($file_loc = $this->locator->locate($file->getPath($ext))) {
-                $file->setLocation($file_loc);
+            if ($file->exists($ext)) {
+                $file = $file->withExtension($ext);
                 $file->setMime($handler[1]);
                 $file->setFound();
                 $handle = $handler[0];
                 if (!is_callable($handle)) {
                     $handle = [$this, $handle];
                 }
-                return call_user_func($handle, $file, $ext);
+                return call_user_func($handle, $file);
             }
         }
 
@@ -102,15 +95,14 @@ class Renderer implements HandlerInterface
 
     /**
      * @param FileInfo $file
-     * @param string   $ext
      * @return FileInfo
      */
-    private function markToHtml($file, $ext)
+    private function markToHtml($file)
     {
         if (!$this->markUp) {
             throw new \InvalidArgumentException('no converter for CommonMark file');
         }
-        $html = $this->markUp->getHtml($file->getPath($ext));
+        $html = $this->markUp->getHtml($file->getPath());
 
         $file->setContents($html);
         return $file;
@@ -136,7 +128,7 @@ class Renderer implements HandlerInterface
     protected function dummy()
     {
         $this->evaluatePhp(null);
-        $this->markToHtml(null, '');
+        $this->markToHtml(null);
         $this->textToPre(null);
     }
 }

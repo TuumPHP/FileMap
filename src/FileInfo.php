@@ -14,11 +14,6 @@ class FileInfo
     private $extension;
 
     /**
-     * @var string
-     */
-    private $location;
-
-    /**
      * @var resource
      */
     private $resource;
@@ -44,14 +39,51 @@ class FileInfo
     private $misc;
 
     /**
+     * @var LocatorInterface
+     */
+    private $locator;
+
+    /**
      * FileInfo constructor.
      *
-     * @param string $path
+     * @param LocatorInterface $locator
+     * @param string           $path
      */
-    public function __construct($path)
+    public function __construct(LocatorInterface $locator, $path)
     {
+        $this->locator   = $locator;
         $this->path      = $path;
         $this->extension = pathinfo($path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @param string $path
+     * @return FileInfo
+     */
+    public function withPath($path)
+    {
+        $self = new self($this->locator, $path);
+        return $self;
+    }
+
+    /**
+     * @param string $ext
+     * @return FileInfo
+     */
+    public function withExtension($ext)
+    {
+        $ext = $ext ? '.'.$ext: '';
+        return $this->withPath($this->path . $ext);
+    }
+
+    /**
+     * @param null $ext
+     * @return bool|string
+     */
+    public function exists($ext = null)
+    {
+        $ext = $ext ? '.'.$ext: '';
+        return $this->locator->locate($this->path.$ext) !== false;
     }
 
     /**
@@ -60,14 +92,6 @@ class FileInfo
     public function setFound()
     {
         $this->found    = true;
-    }
-
-    /**
-     * @param string $location
-     */
-    public function setLocation($location)
-    {
-        $this->location = $location;
     }
 
     /**
@@ -133,7 +157,7 @@ class FileInfo
      */
     public function getLocation()
     {
-        return $this->location;
+        return $this->locator->locate($this->path);
     }
 
     /**
